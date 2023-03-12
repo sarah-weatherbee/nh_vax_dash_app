@@ -1,6 +1,9 @@
 import dash
 from dash import html, Dash, dcc, Input, Output, State
 from dash_bootstrap_components.themes import BOOTSTRAP
+import dash_bootstrap_components as dbc
+# from dash_bootstrap_templates import load_figure_template
+
 import plotly.graph_objects as go
 import plotly.express as px
 from plotly.express import data
@@ -38,16 +41,22 @@ def get_options(list_facs):
     return dict_list
 
 
-fac_dropdown = dcc.Dropdown(id='fac-dropdown',
+state_dropdown = dcc.Dropdown(id='state-dropdown',
                             options=get_options(
-                                nh_facil_level['Facility Name'].unique()),
-
-                            #value=nh_facil_level['Facility Name'].sort_values()[0],
-                            value='LANDMARK OF BARDSTOWN REHABILITATION AND NURSING',
-                            placeholder='Start typing a facility name or select from list',
-                            # multi=True
+                            nh_facil_level['State'].drop_duplicates().sort_values()),
+                            value='KY',
+                            placeholder='Type a state abbreviation or select from list',
                             clearable=False
                             )
+
+fac_dropdown = dcc.Dropdown(id='fac-dropdown',
+                            options=get_options(
+                                    nh_facil_level['Facility Name'].drop_duplicates().sort_values()),
+                                    value='LANDMARK OF BARDSTOWN REHABILITATION AND NURSING',
+                                    placeholder='Type a facility name or select from list',
+                                    clearable=False
+                                    )
+
 
 # Define the app layout
 app.layout = html.Div(children=[
@@ -64,7 +73,7 @@ app.layout = html.Div(children=[
         type='circle')
 ])
 
-
+# callback to update the figure for the graph
 @app.callback(
     Output('ts-c19vax-graph', 'figure'),
     [Input('fac-dropdown', 'value')]
@@ -83,7 +92,7 @@ def update_graph(selected_fac):
                             # yaxis_title='Percent Vaccinated',
                             # xaxis_title='',
                             # legend_title='',
-                            title=f'COVID-19 Vaccination Rates for Residents and Healthcare Providers: {selected_fac}')
+                            title=f'Facility: {selected_fac}')
     return ts_c19vax_fig
 
 
