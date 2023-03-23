@@ -2,7 +2,7 @@ import dash
 from dash import html, Dash, dcc, Input, Output, State
 from dash_bootstrap_components.themes import BOOTSTRAP
 import dash_bootstrap_components as dbc
-
+# from dash_bootstrap_templates import load_figure_template
 
 import plotly.graph_objects as go
 import plotly.express as px
@@ -40,7 +40,7 @@ state_to_fac = nh_facil_level.groupby('State')['Facility Name'].agg(list).to_dic
 
 
 # Initialise the app
-app = Dash(external_stylesheets=[dbc.themes.LUX])
+app = Dash()
 
 
 # Creates a list of dictionaries, which have the keys 'label' and 'value'.
@@ -53,21 +53,21 @@ def get_options(list_facs):
 # create dropdowns
 state_dropdown = dcc.Dropdown(id='state-dropdown',
                             options=[{'label': i,'value': i} for i in nh_facil_level['State'].unique()],
-                            value= nh_facil_level['State'].unique()[0],
+                            value='KY',
                             placeholder='Type a state abbreviation or select from list',
                             clearable=False
                             )
 
 city_dropdown = dcc.Dropdown(id='city-dropdown',
                             options=[{'label': i,'value': i} for i  in nh_facil_level['City'].unique()],
-                            value=nh_facil_level['City'].unique()[0],
+                            value=[],
                             placeholder='Type a city name or select from list',
                             clearable=False
                             )
 
 fac_dropdown = dcc.Dropdown(id='fac-dropdown',
                             options=[{'label': i,'value': i} for i in nh_facil_level['Facility Name'].unique()],
-                            value=nh_facil_level['Facility Name'].unique()[0],
+                            value=[],
                             placeholder='Type a facility name or select from list',
                             clearable=False
                             )
@@ -84,17 +84,41 @@ app.layout = html.Div(children=[
     state_dropdown,
     city_dropdown,
     fac_dropdown,
+    html.Button(id='submit-button-state', n_clicks=0, children='Submit'),
+    html.Div(id='output-state', children =[
     dcc.Loading(
         id="loading-1",
         children=[dcc.Graph(id='ts-c19vax-graph')],
         type='circle')
+    ])
 ])
 
 
 # callback to update the city dropdoown options from state dropdown options
 @app.callback(
-        Output('city-dropdown','options'),
-        [Input('state-dropdown','value')])
+        Output('ts-c19vax-graph', 'figure'),
+        Input('submit-button-state', 'n_clicks'),
+        State('fac-dropdown', 'value'),
+        State('city-dropdown', 'value'),
+        State('state-dropdown', 'value'),
+        )
+
+def update_graph(selected_fac,selected_city, selected_state):
+    filtered_nh_data = nh_facil_level[nh_facil_level['Facility Name']
+                                      == selected_fac]
+    ts_c19vax_fig = px.line(filtered_nh_data,
+                            x='week_ending', y=['Healthcare Providers up-to-date with COVID-19 Vaccinations',
+                                                'Residents up-to-date with COVID-19 Vaccinations'],
+                            # plot_bgcolor='rgba(0,0,0,0)',
+                            # paper_bgcolor='rgba(0,0,0,0)',
+                            # font_color='white',
+                            # xaxis_showgrid=False,
+                            # yaxis_showgrid=False,
+                            # yaxis_title='Percent Vaccinated',
+                            # xaxis_title='',
+                            # legend_title='',
+                            title=f'Facility: {selected_fac}')
+    return ts_c19vax_fig
 
 def set_city_options(selected_state): 
         if len(selected_state) > 0:
@@ -104,18 +128,12 @@ def set_city_options(selected_state):
             selected_states = []
             return [{'label': i, 'value': i} for i in sorted(set(nh_facil_level['City'].loc[nh_facil_level['State']==selected_states]))]
 
-@app.callback(
-          Output('city-dropdown','value'),
-        [Input('city-dropdown','options')])
-
-def set_city_value(available_cities):
-     return available_cities[0]['value']
-     
-
 # callback to update the facility dropdoown options from city dropdown options
 @app.callback(
         Output('fac-dropdown','options'),
-        [Input('city-dropdown','value')])          
+        [
+        Input('city-dropdown','value'),
+         ])          
 
 def set_fac_options(selected_city):
         if len(selected_city) > 0:
@@ -125,12 +143,7 @@ def set_fac_options(selected_city):
             selected_cities = []
             return [{'label': i, 'value': i} for i in sorted(set(nh_facil_level['Facility Name'].loc[nh_facil_level['City']==selected_cities]))]
 
-@app.callback(
-        Output('fac-dropdown','value'),
-        [Input('fac-dropdown','options')])
 
-def set_fac_value(available_facs):
-     return available_facs[0]['value']
 
 # callback to update the figure for the graph
 @app.callback(
