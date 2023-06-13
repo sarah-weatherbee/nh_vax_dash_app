@@ -41,7 +41,6 @@ ltnn_rev_pct_hcp_utd_c19_vax = (
     .reset_index(drop=True)
     .loc[:,['provider_name','week_ending','rev_pct_hcp_utd_c19_vax']]
 )
-ltnn_rev_pct_hcp_utd_c19_vax.head(30)
 
 # Set app theme
 app = Dash(external_stylesheets=[dbc.themes.LUX])
@@ -82,9 +81,17 @@ def blank_figure():
 
     return fig
 
+def blank_cards():
+    card = dbc.Card(dbc.CardBody(
+                [
+                    html.H5("")
+                    ]
+                    )
+                    )
+    return card
 
 # Define the app layout
-app.layout =dbc.Container(html.Div(children=[
+app.layout =html.Div(children=[
     html.H1(children='COVID-19 vaccination rates in Nursing Homes',
             style={
                 'textAlign': 'left',
@@ -102,22 +109,34 @@ app.layout =dbc.Container(html.Div(children=[
                'color': '#55595c',
                'title-font-family': 'sans-serif',
                'font-family': 'sans-serif',
-                'margin': '2rem'
+                'margin': '3rem'
                }
     ),
+    #html.H1(children='COVID-19 vaccination rates in Nursing Homes'),
+    
     dcc.Loading(
         id="loading-2",
         type='circle',
         children=[
-    #    dbc.Row(
-    #             #dbc.Col(dcc.Graph(id='ind_utd_hcp_c19_vax', figure=blank_figure())),
-    #            [dbc.Col(dcc.Graph(id='ind_utd_hcp_c19_vax', figure=blank_figure())),
-    #             dbc.Col(dcc.Graph(id='ind_at_hcp_c19_vax', figure=blank_figure()))]
-    #             ),
-        
-            #dcc.Graph(id='ind_utd_hcp_c19_vax', figure=blank_figure()),
-            dcc.Graph(id='utd_hcp_res_ts_fig', figure=blank_figure()),
+
+        dbc.Row(children=[
+                  dbc.Row(id='latest_week', style={
+                        'margin-top': '4rem',
+                        'margin-left':'1rem',
+                        'margin-right':'1rem',
+                        
+
+                    }),
+                     
+                    dbc.Col(id='cards', style={
+                        'margin': '4rem'
+                    }),
+        ]),
+                
+             
             dcc.Graph(id='at_hcp_res_ts_fig', figure=blank_figure()),
+            dcc.Graph(id='utd_hcp_res_ts_fig', figure=blank_figure()),
+            
             # dcc.Graph(id='ind_latest_dt', figure=blank_figure()),
             
                           
@@ -144,7 +163,8 @@ app.layout =dbc.Container(html.Div(children=[
                           
                           }
 ),
-]))
+]
+)
 
 
 # callback to update the city dropdown options from state dropdown options
@@ -196,7 +216,9 @@ def set_fac_value(available_facs):
     # Output('ind_utd_res_c19_vax','figure'),
     # Output('ind_at_hcp_c19_vax','figure'),
     # Output('ind_utd_hcp_c19_vax','figure'),
-    [Output('utd_hcp_res_ts_fig', 'figure'),
+    [Output('latest_week', 'children'),
+    Output('cards', 'children'),
+    Output('utd_hcp_res_ts_fig', 'figure'),
     Output('at_hcp_res_ts_fig', 'figure')],
     [Input('fac-dropdown', 'value')]
 )
@@ -219,80 +241,64 @@ def update_graph(selected_fac):
 
     # utd_ts_data.sort_values('week_ending', ascending=False)
 
-    # latest_week = utd_ts_data.loc[utd_ts_data['rev_pct_res_utd_c19_vax'].last_valid_index(),'week_ending']
+    latest_wk = utd_ts_data.loc[(utd_ts_data['provider_name'] == selected_fac) & (utd_ts_data['rev_pct_res_anytime_c19_vax'].notnull())].sort_values('week_ending', ascending=False).iloc[0]['week_ending']
+
     # metric_value = utd_ts_data.loc[utd_ts_data['week_ending']==latest_week, 'rev_pct_res_utd_c19_vax']
     # return metric_value, f'Latest Week: {latest_week}'
 
-
-    # ind_latest_dt = go.Figure()
-
-    # ind_latest_dt.add_trace(go.Indicator(
-    # mode = "number+delta",
-    # value = utd_ts_data.loc[utd_ts_data['week_ending'].iloc[-1],'rev_pct_hcp_utd_c19_vax'].round().astype(
-    #             str)+'%',
-    # title = {"text": "Accounts<br><span style='font-size:0.8em;color:gray'>Subtitle</span><br><span style='font-size:0.8em;color:gray'>Subsubtitle</span>"},
-    # delta = {'reference': 400, 'relative': True},
-    # domain = {'x': [0.6, 1], 'y': [0, 1]}
-    # )
-    # )
+   
+    latest_week=dbc.Container(
+        
+            html.H4('as of week ending 'f'{latest_wk}', className="display-3 text-left font-weight-bold flex")
+        ),
     
-    # ind_utd_res_c19_vax = go.Figure()
-
-    # ind_utd_res_c19_vax.add_trace(
-    #     go.Indicator(
-    #      mode="number",
-    #     value = ltnn_rev_pct_res_utd_c19_vax.round(),
-    #     number = {"suffix": "%"},
-    #     domain = {'row': 1, 'column': 1}
-    #         )
-    #     )
-    
-    # ind_utd_res_c19_vax.update_layout(
-    # #grid = {'rows': 1, 'columns': 4, 'pattern': "independent"},
-    # template = {'data' : {'indicator': [{
-    #     'title': {'text': "Res<br>vaccinations up-to-date"},
-    #     'mode' : "number",
-    #     'domain' : {'x': [0.6, 1], 'y': [0, 1]}}]
-    #                      }})
-    
-    
-    # ind_utd_hcp_c19_vax = go.Figure()
-
-    # ind_utd_hcp_c19_vax.add_trace(
-    #     go.Indicator(
-    #      mode="number",
-    #     value = ltnn_rev_pct_hcp_utd_c19_vax.round(),
-    #     number = {"suffix": "%"},
-    #     domain = {'row': 1, 'column': 1}
-    #         )
-    #     )
-    
-    # ind_utd_hcp_c19_vax.update_layout(
-    # #grid = {'rows': 1, 'columns': 4, 'pattern': "independent"},
-    # template = {'data' : {'indicator': [{
-    #     'title': {'text': "Health Care Personnel<br>vaccinations up-to-date"},
-    #     'mode' : "number",
-    #     'domain' : {'x': [0.6, 1], 'y': [0, 1]}}]
-    #                      }})
-    
-    # ind_at_hcp_c19_vax = go.Figure()
-
-    # ind_at_hcp_c19_vax.add_trace(
-    #     go.Indicator(
-    #      mode="number",
-    #     value = ltnn_rev_pct_hcp_at_c19_vax.round(),
-    #     number = {"suffix": "%"},
-    #     domain = {'row': 1, 'column': 1}
-    #         )
-    #     )
-    
-    # ind_at_hcp_c19_vax.update_layout(
-    # #grid = {'rows': 1, 'columns': 4, 'pattern': "independent"},
-    # template = {'data' : {'indicator': [{
-    #     'title': {'text': "Health Care Personnel<br>vaccinated at any time"},
-    #     'mode' : "number",
-    #     'domain' : {'x': [0.6, 1], 'y': [0, 1]}}]
-    #                      }})
+    cards = dbc.CardGroup([   
+        dbc.Card(
+            dbc.CardBody(
+                [
+                    html.P("Healthcare Staff Vaccinated at Any Time", className="card-title text-center"),
+                    html.H2(""),
+                    html.H1(f'{ltnn_rev_pct_hcp_at_c19_vax:,.0f}%',
+                        className="display-2 text-center font-weight-bold",
+                    ), 
+                ],className="justify-content-end"
+            ), 
+        ),
+        dbc.Card(
+            dbc.CardBody(
+                [
+                    html.P("Residents Vaccinated at Any Time", className="card-title text-center"),
+                    html.H2(""),
+                    html.H1(f'{ltnn_rev_pct_res_at_c19_vax:,.0f}%',
+                        className="display-2 text-center font-weight-bold", 
+                    ),
+                ]
+            )
+        ),
+        dbc.Card(
+            dbc.CardBody(
+                [
+                    html.P("Healthcare Staff Vaccinations Up-to-Date", className="card-title text-center"),
+                    html.H2(""),
+                    html.H1(f'{ltnn_rev_pct_hcp_utd_c19_vax:,.0f}%',
+                        className="display-2 text-center font-weight-bold",
+                    ),
+                ]
+            )
+        ),
+        dbc.Card(
+            dbc.CardBody(
+                [
+                    html.P("Residents Vaccinations Up-to-Date", className="card-title text-center"),
+                    html.H2(""),
+                    html.H1(f'{ltnn_rev_pct_res_utd_c19_vax:,.0f}%',
+                        className="display-2 text-center font-weight-bold",
+                    ),
+                ]
+            ),
+        ),
+    ],
+)
 
     utd_hcp_res_ts_fig = go.Figure()
 
@@ -476,7 +482,7 @@ def update_graph(selected_fac):
 
 
     #return ind_utd_res_c19_vax, ind_utd_hcp_c19_vax, ind_at_hcp_c19_vax, 
-    return utd_hcp_res_ts_fig, at_hcp_res_ts_fig
+    return latest_week, cards, utd_hcp_res_ts_fig, at_hcp_res_ts_fig
 
 # Run the app
 if __name__ == '__main__':
