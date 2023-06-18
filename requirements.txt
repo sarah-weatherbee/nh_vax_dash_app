@@ -2,6 +2,7 @@
 Babel
 dash
 dash-bootstrap-components
+dash_bootstrap_templates
 pandas
 pandas-stubs
 plotly
