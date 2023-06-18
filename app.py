@@ -101,9 +101,29 @@ app.layout =html.Div(children=[
                 'margin': '2rem'}
             ),
     html.Div(children=[
-        state_dropdown,
-        city_dropdown,
-        fac_dropdown
+        html.Div(children=[
+            html.P("Select a state"),
+            state_dropdown],
+            style={
+                'border-style': 'ridge', 
+            }
+            ),
+            html.Br(),
+        html.Div(children=[
+            html.P("Select a city"),
+            city_dropdown],
+            style={
+                'border-style': 'ridge', 
+            }
+        ),
+        html.Br(),
+         html.Div(children=[
+            html.P("Select a nursing home"),
+        fac_dropdown],
+         style={
+                'border-style': 'ridge', 
+            }
+         )
     ],
         style={'textAlign': 'left',
                'color': '#55595c',
@@ -124,16 +144,22 @@ app.layout =html.Div(children=[
                         'margin-top': '4rem',
                         'margin-left':'1rem',
                         'margin-right':'1rem',
-                        
+
 
                     }),
                      
                     dbc.Col(id='cards', style={
-                        'margin': '4rem'
+                        'margin-left': '4rem',
+                        'margin-right': '4rem',
+                        'margin-bottom': '4rem'
                     }),
         ]),
                 
-             
+            dbc.Row(id='long', style={
+                        'margin-top': '4rem',
+                        'margin-left':'1rem',
+                        'margin-right':'1rem'
+                    }),
             dcc.Graph(id='at_hcp_res_ts_fig', figure=blank_figure()),
             dcc.Graph(id='utd_hcp_res_ts_fig', figure=blank_figure()),
             
@@ -217,6 +243,7 @@ def set_fac_value(available_facs):
     # Output('ind_at_hcp_c19_vax','figure'),
     # Output('ind_utd_hcp_c19_vax','figure'),
     [Output('latest_week', 'children'),
+    Output('long', 'children'),
     Output('cards', 'children'),
     Output('utd_hcp_res_ts_fig', 'figure'),
     Output('at_hcp_res_ts_fig', 'figure')],
@@ -249,7 +276,7 @@ def update_graph(selected_fac):
    
     latest_week=dbc.Container(
         
-            html.H4('as of week ending 'f'{latest_wk}', className="display-3 text-left font-weight-bold flex")
+            html.P('AS OF WEEK ENDING 'f'{latest_wk}:', className="text-left fs-1 font-weight-bold flex")
         ),
     
     cards = dbc.CardGroup([   
@@ -260,6 +287,9 @@ def update_graph(selected_fac):
                     html.H2(""),
                     html.H1(f'{ltnn_rev_pct_hcp_at_c19_vax:,.0f}%',
                         className="display-2 text-center font-weight-bold",
+                        style={
+                            'color':'#727ff2'
+                        }
                     ), 
                 ],className="justify-content-end"
             ), 
@@ -271,6 +301,9 @@ def update_graph(selected_fac):
                     html.H2(""),
                     html.H1(f'{ltnn_rev_pct_res_at_c19_vax:,.0f}%',
                         className="display-2 text-center font-weight-bold", 
+                        style={
+                            'color':'#b0841c'
+                        }
                     ),
                 ]
             )
@@ -282,6 +315,9 @@ def update_graph(selected_fac):
                     html.H2(""),
                     html.H1(f'{ltnn_rev_pct_hcp_utd_c19_vax:,.0f}%',
                         className="display-2 text-center font-weight-bold",
+                        style={
+                            'color':'#727ff2'
+                        }
                     ),
                 ]
             )
@@ -293,12 +329,16 @@ def update_graph(selected_fac):
                     html.H2(""),
                     html.H1(f'{ltnn_rev_pct_res_utd_c19_vax:,.0f}%',
                         className="display-2 text-center font-weight-bold",
+                         style={
+                            'color':'#b0841c'
+                        }
                     ),
                 ]
             ),
         ),
     ],
-)
+),
+    long=html.P('WEEK ENDING 7-10-2022 through 'f'{latest_wk}', className="text-left fs-1 font-weight-bold flex")
 
     utd_hcp_res_ts_fig = go.Figure()
 
@@ -482,10 +522,11 @@ def update_graph(selected_fac):
 
 
     #return ind_utd_res_c19_vax, ind_utd_hcp_c19_vax, ind_at_hcp_c19_vax, 
-    return latest_week, cards, utd_hcp_res_ts_fig, at_hcp_res_ts_fig
+    return latest_week, long, cards, utd_hcp_res_ts_fig, at_hcp_res_ts_fig
 
 # Run the app
 if __name__ == '__main__':
     app.run_server(debug=True)
+    server = app.server
 
 
