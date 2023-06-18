@@ -21,7 +21,7 @@ Taken from https://codepen.io/chriddyp/pen/bWLwgP.css
     position: relative;
     width: 100%;
     max-width: 960px;
-    margin: 0 auto;
+    margin: 0 20px;
     padding: 0 20px;
     box-sizing: border-box;
   }
@@ -46,7 +46,7 @@ Taken from https://codepen.io/chriddyp/pen/bWLwgP.css
         margin-left: 4%;
    }
     .column:first-child, .columns:first-child {
-        margin-left: 0;
+        margin-left: 10;
    }
     .one.column, .one.columns {
         width: 4.66666666667%;
@@ -152,10 +152,12 @@ Taken from https://codepen.io/chriddyp/pen/bWLwgP.css
   }
   
   /* Typography –––––––––––––––––––––––––––––––––––––––––––––––––– */
-  h1, h2, h3, h4, h5, h6 {
+  h1, h2, h3, h4, h5, h6, p, A {
     margin-top: 0;
     margin-bottom: 0;
     font-weight: 300;
+    color: #55595c;
+    font-family: sans-serif;
   }
   h1 {
     font-size: 4.5rem;
@@ -199,7 +201,8 @@ Taken from https://codepen.io/chriddyp/pen/bWLwgP.css
     margin-top: 0.75rem;
   }
   p {
-    margin-top: 0;
+    margin-bottom: 1rem;
+    margin-top: 1.5rem;
   }
   /* Blockquotes –––––––––––––––––––––––––––––––––––––––––––––––––– */
   blockquote {
@@ -207,13 +210,17 @@ Taken from https://codepen.io/chriddyp/pen/bWLwgP.css
     padding-left: 1rem;
     margin-top: 2rem;
     margin-bottom: 2rem;
-    margin-left: 0rem;
+    margin-left: 2rem;
   }
   /* Links –––––––––––––––––––––––––––––––––––––––––––––––––– */
   a {
-    color: #1EAEDB;
+    color: #55595c;
     text-decoration: underline;
     cursor: pointer;
+    margin-left:3rem;
+    font-family: sans-serif;
+    margin-bottom: 4rem;
+    margin-top: 1rem;
   }
   a:hover {
     color: #0FA0CE;
@@ -229,15 +236,16 @@ Taken from https://codepen.io/chriddyp/pen/bWLwgP.css
   
   
   .main-svg{
-    font-family: "Open Sans Semi Bold"
+    font-family: sans-serif
   }
   
-  .gtitle{
+  /* .gtitle{
     font-family: "Open Sans Semi Bold" !important
-  }
+  } */
   
   .g-title{
-    font-family: "Open Sans Semi Bold"
+    font-family: sans-serif;
+    font-size: 14px
   }
   
   
@@ -416,14 +424,16 @@ Taken from https://codepen.io/chriddyp/pen/bWLwgP.css
   /* Main Layout ––––––––––––––––––––––––––––––––––––––––––––––––––*/
   html, body{
     height: 100%;
+    font-family: sans-serif;
   }
   
   body {
     background-color: #ffffff;
-    color: black;
+    color: #55595c;
     height: 100%;
-    margin: 0;
+    /* margin: 5rem; */
     padding: 0;
+    font-family: sans-serif
   }
   
   .react-entry-point{
@@ -431,16 +441,18 @@ Taken from https://codepen.io/chriddyp/pen/bWLwgP.css
   }
   
   h1, h2, h3, h4, h5 {
-    font-family: "Open Sans Semi Bold";
+    font-family: sans-serif;
     letter-spacing: 2.1px;
     font-size: 21px;
-    padding-left: 12px;
+    padding-left: 8px;
+    font-weight: 400;
   }
   p {
-    font-family: "Open Sans Light";
+    /*font-family: "sans-serif" !important;*/
     font-weight: 400;
-    font-size: 14px;
-    padding-left: 12px;
+    font-size: 16px;
+    padding-left: 8px;
+    font-family: inherit;
   }
   a {
     text-decoration: none;
@@ -457,6 +469,7 @@ Taken from https://codepen.io/chriddyp/pen/bWLwgP.css
     flex-direction: column;
     height: 100vh;
     width: 100%;
+    margin: 10px
   }
   #histogram {
     flex-grow: 1
@@ -486,7 +499,7 @@ Taken from https://codepen.io/chriddyp/pen/bWLwgP.css
   }
   .Select-control, .Select-menu-outer, .Select-multi-value-wrapper, .select-up, .is-open .Select-control {
     background-color: #ffffff;
-    color: black;
+    color: #55595c;
     font-family: sans-serif;
   
   }
@@ -503,7 +516,7 @@ Taken from https://codepen.io/chriddyp/pen/bWLwgP.css
   }
   
   .has-value.Select--single>.Select-control .Select-value .Select-value-label, .has-value.is-pseudo-focused.Select--single>.Select-control .Select-value .Select-value-label {
-    color: black;
+    color: #55595c;
     background: white;
     background-color: white;
   }
@@ -513,9 +526,9 @@ Taken from https://codepen.io/chriddyp/pen/bWLwgP.css
     position: relative;
   }
   .has-value.Select--single>.Select-control .Select-value .Select-value-label, .has-value.is-pseudo-focused.Select--single>.Select-control .Select-value .Select-value-labeln {
-    color: black;
+    color: #55595c;
     font-weight: 400;
-    font-size: 14px;
+    font-size: 13px;
   }
   
   .Input.DateInput_1 {
@@ -524,7 +537,7 @@ Taken from https://codepen.io/chriddyp/pen/bWLwgP.css
   
   #date {
     background-color: #1e1e1e;
-    font-family: "Open Sans Light";
+    font-family: sans-serif;
     font-weight: 400;
     color: #dbdbdb;
     border: 0.5px solid #dbdbdb44;
@@ -574,40 +587,53 @@ Taken from https://codepen.io/chriddyp/pen/bWLwgP.css
   
   /* For Mobile Phones and small screens ––––––––––––––––––––––––––––––––––––––––––––––––––*/
   @media only screen and (max-width: 768px) {
+    .root-container {
+      display: flex;
+      flex-wrap: wrap;
+      flex-direction: column;
+      height: 300px;
+  }
+
+
     .four, .eight {
         min-width: 100%;
    }
-    h1, h2, h3, p {
+    h1, h2, h3, p,a {
         text-align: center;
    }
     body {
-        display: block;
-        margin: 0px;
-        overflow-y: scroll;
+        display: flex;
+        flex-wrap: wrap;
+        flex-direction: column;
+        height: 300px;
+        margin: 5px;
+        overflow-y: scroll
     }
     .div-for-charts {
-        padding: 0px;
+        padding: 7px;
         width: 100%;
         text-align: center;
+        margin: 7px
    }
   
    .div-user-controls {
-      padding: 32px;
+      padding: 20px;
    }
   
    .side-by-side{
-      display: inline-block;
-      width: 48%;
+      display: flex;
+      flex-wrap: wrap;
+      width: 70%;
     }
   
   
    .side-by-side-right{
       display: inline-block;
-      width: 48%;
-      float: right;
+      width: 70%;
+      /* float: right; */
     }
     .div-for-charts{
-      margin: 0px;
+      margin: 3rem;
     }
   }
   

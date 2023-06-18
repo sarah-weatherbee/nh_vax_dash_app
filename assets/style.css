@@ -22,7 +22,7 @@ hr {
 }
 
 .data-table-div {
-    margin: auto;
+    margin: 10px;
     padding: 10px;
 }
 
@@ -45,7 +45,7 @@ hr {
 }
 
 .budget-tooltip {
-    font-size: 18px;
+    -size: 18px;
 }
 
 .checklist {
