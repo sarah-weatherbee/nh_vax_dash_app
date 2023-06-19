@@ -13,6 +13,7 @@ import dash_bootstrap_components as dbc
 import plotly.io as pio
 pio.templates
 
+
 dbc_css = "https://cdn.jsdelivr.net/gh/AnnMarieW/dash-bootstrap-templates/dbc.min.css"
 
 load_figure_template("LUX")
