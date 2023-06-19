@@ -1,4 +1,6 @@
 import plotly.figure_factory as ff
+import datetime
+from datetime import datetime
 import pandas as pd
 from plotly.express import data
 import plotly.express as px
@@ -26,6 +28,8 @@ names_dict = {
     # 'rev_pct_res_utd_c19_vax': 'Residents up-to-date with COVID-19 Vaccinations',
     # 'rev_pct_hcp_utd_c19_vax': 'Healthcare Providers up-to-date with COVID-19 Vaccinations'
 }
+# convert week_ending col to datetime format
+# nh_facil_level['week_ending'] = pd.to_datetime(nh_facil_level['week_ending'],utc=True)
 
 nh_facil_level.rename(columns=names_dict, inplace=True)
 nh_facil_level['provider_name'] = nh_facil_level['provider_name'].fillna('-')
@@ -251,9 +255,11 @@ def set_fac_value(available_facs):
 )
 
 
+
 def update_graph(selected_fac):
-    utd_ts_data = nh_facil_level[(
-        nh_facil_level['provider_name'] == selected_fac) & (nh_facil_level['week_ending'] > '2022-07-03')]
+    utd_ts_data = nh_facil_level[(nh_facil_level['provider_name'] == selected_fac)]
+         
+         ## & (nh_facil_level['week_ending'] > dt_obj)]
     
     ltnn_rev_pct_res_at_c19_vax = utd_ts_data.loc[(utd_ts_data['provider_name'] == selected_fac) & (utd_ts_data['rev_pct_res_anytime_c19_vax'].notnull())].sort_values('week_ending', ascending=False).iloc[0]['rev_pct_res_anytime_c19_vax'].round()
     ltnn_rev_pct_res_utd_c19_vax = utd_ts_data.loc[(utd_ts_data['provider_name'] == selected_fac) & (utd_ts_data['rev_pct_res_utd_c19_vax'].notnull())].sort_values('week_ending', ascending=False).iloc[0]['rev_pct_res_utd_c19_vax'].round()
@@ -269,7 +275,7 @@ def update_graph(selected_fac):
     # utd_ts_data.sort_values('week_ending', ascending=False)
 
     latest_wk = utd_ts_data.loc[(utd_ts_data['provider_name'] == selected_fac) & (utd_ts_data['rev_pct_res_anytime_c19_vax'].notnull())].sort_values('week_ending', ascending=False).iloc[0]['week_ending']
-
+    # latest_wk = latest_wk.dt.strftime('%m-%d-%Y')
     # metric_value = utd_ts_data.loc[utd_ts_data['week_ending']==latest_week, 'rev_pct_res_utd_c19_vax']
     # return metric_value, f'Latest Week: {latest_week}'
 
