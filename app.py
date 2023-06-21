@@ -16,7 +16,7 @@ pio.templates
 
 dbc_css = "https://cdn.jsdelivr.net/gh/AnnMarieW/dash-bootstrap-templates/dbc.min.css"
 
-load_figure_template("LUX")
+# load_figure_template("LUX")
 
 nh_facil_level = pd.read_csv(
     'data/data_post_proc/nh_latest_sub_2_y.csv', sep='|', parse_dates=True, low_memory=False)
@@ -30,7 +30,7 @@ names_dict = {
     # 'rev_pct_hcp_utd_c19_vax': 'Healthcare Providers up-to-date with COVID-19 Vaccinations'
 }
 # convert week_ending col to datetime format
-# nh_facil_level['week_ending'] = pd.to_datetime(nh_facil_level['week_ending'],utc=True)
+nh_facil_level['week_ending'] = pd.to_datetime(nh_facil_level['week_ending'],format='%Y/%m/%d').dt.strftime('%m-%d-%Y')
 
 nh_facil_level.rename(columns=names_dict, inplace=True)
 nh_facil_level['provider_name'] = nh_facil_level['provider_name'].fillna('-')
@@ -57,7 +57,12 @@ state_dropdown = dcc.Dropdown(id='state-dropdown',
                                        for i in nh_facil_level['State'].unique()],
                               value=nh_facil_level['State'].unique()[0],
                               placeholder='Type a state abbreviation or select from list',
-                              clearable=False
+                              clearable=False,
+                              style={
+                            'border-style': 'ridge', 
+                            'border-radius': '15px',
+                            'border-color':'#00000020'
+                            }
                               )
 
 city_dropdown = dcc.Dropdown(id='city-dropdown',
@@ -65,22 +70,32 @@ city_dropdown = dcc.Dropdown(id='city-dropdown',
                                       for i in nh_facil_level['City'].unique()],
                              value=nh_facil_level['City'].unique()[0],
                              placeholder='Type a city name or select from list',
-                             clearable=False
-                             )
+                             clearable=False,
+                             style={
+                            'border-style': 'ridge', 
+                            'border-radius': '15px',
+                            'border-color':'#00000020'
+                            }
+                            )
 
 fac_dropdown = dcc.Dropdown(id='fac-dropdown',
                             options=[{'label': i, 'value': i}
                                      for i in nh_facil_level['provider_name'].unique()],
                             value=nh_facil_level['provider_name'].unique()[0],
                             placeholder='Type a facility name or select from list',
-                            clearable=False
+                            clearable=False,
+                            style={
+                            'border-style': 'ridge', 
+                            'border-radius': '15px',
+                            'border-color':'#00000020'
+                            }
                             )
 fig = go.Figure()
 
 
 def blank_figure():
     fig = go.Figure(go.Scatter(x=[], y=[]))
-    fig.update_layout(template="LUX")
+    #fig.update_layout(template="LUX")
     fig.update_xaxes(showgrid=False, showticklabels=False, zeroline=False)
     fig.update_yaxes(showgrid=False, showticklabels=False, zeroline=False)
 
@@ -103,41 +118,35 @@ app.layout =html.Div(children=[
                 'color': '#55595c',
                 'title-font-family': 'sans-serif',
                 'font-family': 'sans-serif',
-                'margin': '2rem'}
+                'font-size': '30px',
+                'margin': '3rem'}
             ),
     html.Div(children=[
         html.Div(children=[
-            html.P("Select a state"),
+            html.H6("Select a state",style={   
+            }),
             state_dropdown],
-            style={
-                'border-style': 'ridge', 
-            }
             ),
             html.Br(),
         html.Div(children=[
-            html.P("Select a city"),
+            html.H6("Select a city", style={ 
+            }),
             city_dropdown],
-            style={
-                'border-style': 'ridge', 
-            }
         ),
         html.Br(),
          html.Div(children=[
-            html.P("Select a nursing home"),
+            html.H6("Select a nursing home",style={
+            }),
         fac_dropdown],
-         style={
-                'border-style': 'ridge', 
-            }
          )
     ],
         style={'textAlign': 'left',
                'color': '#55595c',
                'title-font-family': 'sans-serif',
                'font-family': 'sans-serif',
-                'margin': '3rem'
+                'margin': '4rem'
                }
     ),
-    #html.H1(children='COVID-19 vaccination rates in Nursing Homes'),
     
     dcc.Loading(
         id="loading-2",
@@ -149,8 +158,6 @@ app.layout =html.Div(children=[
                         'margin-top': '4rem',
                         'margin-left':'1rem',
                         'margin-right':'1rem',
-
-
                     }),
                      
                     dbc.Col(id='cards', style={
@@ -162,29 +169,28 @@ app.layout =html.Div(children=[
                 
             dbc.Row(id='long', style={
                         'margin-top': '4rem',
-                        'margin-left':'1rem',
+                        'margin-left':'3rem',
                         'margin-right':'1rem'
                     }),
             dcc.Graph(id='at_hcp_res_ts_fig', figure=blank_figure()),
             dcc.Graph(id='utd_hcp_res_ts_fig', figure=blank_figure()),
-            
-            # dcc.Graph(id='ind_latest_dt', figure=blank_figure()),
-            
+               
                           
-           html.Div(children=[html.P("Data Source: ",''),
+           dbc.Row(children=([html.P("Data Source: ",''),
                     (html.A("CMS Covid-19 Nursing Home Data",
                             href="https://data.cms.gov/covid-19/covid-19-nursing-home-data",
-                              target="_blank")
-                  ),
-                  ],
+                              target="_blank",style={
+                                  'color': '#1237E4'
+                                  })
+           )]),
                           style={'textAlign': 'left',
-                          'color': '#55595c',
+                          'color': '#1237E4',
                           'title-font-family': 'sans-serif',
                           'font-family': 'sans-serif',
                           'margin': '3rem'
                           }
-            ),
-            
+        ),
+        
    
 ],
  style={'textAlign': 'left',
@@ -283,7 +289,7 @@ def update_graph(selected_fac):
    
     latest_week=dbc.Container(
         
-            html.P('AS OF WEEK ENDING 'f'{latest_wk}:', className="text-left fs-1 font-weight-bold flex")
+            html.H4('As of week ending 'f'{latest_wk}', className="display-left fs-1 font-weight-bold flex")
         ),
     
     cards = dbc.CardGroup([   
@@ -345,7 +351,7 @@ def update_graph(selected_fac):
         ),
     ],
 ),
-    long=html.P('WEEK ENDING 7-10-2022 through 'f'{latest_wk}', className="text-left fs-1 font-weight-bold flex")
+    long=html.H4('From week ending 7-10-2022 through 'f'{latest_wk}', className="display-left fs-1 font-weight-bold flex")
 
     utd_hcp_res_ts_fig = go.Figure()
 
@@ -525,7 +531,6 @@ def update_graph(selected_fac):
         showgrid=False,
         automargin=True
     )
-
 
 
     #return ind_utd_res_c19_vax, ind_utd_hcp_c19_vax, ind_at_hcp_c19_vax, 
