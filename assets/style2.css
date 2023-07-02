@@ -21,6 +21,7 @@ Taken from https://codepen.io/chriddyp/pen/bWLwgP.css
     position: relative;
     width: 100%;
     max-width: 960px;
+    
     margin: 0 20px;
     padding: 0 20px;
     box-sizing: border-box;
@@ -491,7 +492,7 @@ Taken from https://codepen.io/chriddyp/pen/bWLwgP.css
   }
   .div-for-slider {
     width: 97%;
-    text-align: center;
+    text-align: left;
   }
   .logo {
     height: 50px;
@@ -528,7 +529,7 @@ Taken from https://codepen.io/chriddyp/pen/bWLwgP.css
   .has-value.Select--single>.Select-control .Select-value .Select-value-label, .has-value.is-pseudo-focused.Select--single>.Select-control .Select-value .Select-value-labeln {
     color: #55595c;
     font-weight: 400;
-    font-size: 13px;
+    font-size: 16px;
   }
   
   .Input.DateInput_1 {
@@ -598,9 +599,12 @@ Taken from https://codepen.io/chriddyp/pen/bWLwgP.css
     .four, .eight {
         min-width: 100%;
    }
-    h1, h2, h3, p,a {
-        text-align: center;
+   /*
+    h1, h2, h3, p, a {
+         text-align: center; 
    }
+   */
+   
     body {
         display: flex;
         flex-wrap: wrap;

@@ -16,7 +16,6 @@ pio.templates
 
 dbc_css = "https://cdn.jsdelivr.net/gh/AnnMarieW/dash-bootstrap-templates/dbc.min.css"
 
-# load_figure_template("LUX")
 
 nh_facil_level = pd.read_csv(
     'data/data_post_proc/nh_latest_sub_2_y.csv', sep='|', parse_dates=True, low_memory=False)
@@ -34,6 +33,7 @@ nh_facil_level['week_ending'] = pd.to_datetime(nh_facil_level['week_ending'],for
 
 nh_facil_level.rename(columns=names_dict, inplace=True)
 nh_facil_level['provider_name'] = nh_facil_level['provider_name'].fillna('-')
+nh_facil_level['County'] = nh_facil_level['County'].fillna('-')
 nh_facil_level['City'] = nh_facil_level['City'].fillna('-')
 nh_facil_level = nh_facil_level.sort_values(
     ['State', 'County', 'City', 'provider_name'])
@@ -95,7 +95,7 @@ fig = go.Figure()
 
 def blank_figure():
     fig = go.Figure(go.Scatter(x=[], y=[]))
-    #fig.update_layout(template="LUX")
+    fig.update_layout(template="none")
     fig.update_xaxes(showgrid=False, showticklabels=False, zeroline=False)
     fig.update_yaxes(showgrid=False, showticklabels=False, zeroline=False)
 
@@ -149,7 +149,7 @@ app.layout =html.Div(children=[
     ),
     
     dcc.Loading(
-        id="loading-2",
+        id="loading-1",
         type='circle',
         children=[
 
@@ -172,11 +172,28 @@ app.layout =html.Div(children=[
                         'margin-left':'3rem',
                         'margin-right':'1rem'
                     }),
-            dcc.Graph(id='at_hcp_res_ts_fig', figure=blank_figure()),
-            dcc.Graph(id='utd_hcp_res_ts_fig', figure=blank_figure()),
-               
+            dbc.Spinner(delay_hide=5, children=[
+            dcc.Graph(id='at_hcp_res_ts_fig',
+                      figure=blank_figure(),
+                      style={
+                        'margin-left': '4rem',
+                        'margin-right': '4rem',
+                        'height':'100%'
+                        }
+                        ),
+            dcc.Graph(id='utd_hcp_res_ts_fig',
+                      figure=blank_figure(),
+                      style={
+                        'margin-left': '4rem',
+                        'margin-right': '4rem'
+                        }
+                        ),
+                        ],
+                        
+            ),
+            html.Br(),
                           
-           dbc.Row(children=([html.P("Data Source: ",''),
+           dbc.Row(children=([html.P("SOURCES: ",''),
                     (html.A("CMS Covid-19 Nursing Home Data",
                             href="https://data.cms.gov/covid-19/covid-19-nursing-home-data",
                               target="_blank",style={
@@ -188,16 +205,18 @@ app.layout =html.Div(children=[
                           'title-font-family': 'sans-serif',
                           'font-family': 'sans-serif',
                           'margin': '3rem'
-                          }
+                          },
+                          
         ),
         
    
 ],
  style={'textAlign': 'left',
                           'color': '#55595c',
+                          'font-weight': 'bold',
                           'title-font-family': 'sans-serif',
                           'font-family': 'sans-serif',
-                          
+                          'margin': '4rem'
                           }
 ),
 ]
@@ -248,11 +267,6 @@ def set_fac_value(available_facs):
 
 
 @app.callback(
-    # Output("staff-vaccination-rate", "children"),
-    # Output('ind_at_res_c19_vax','figure'),
-    # Output('ind_utd_res_c19_vax','figure'),
-    # Output('ind_at_hcp_c19_vax','figure'),
-    # Output('ind_utd_hcp_c19_vax','figure'),
     [Output('latest_week', 'children'),
     Output('long', 'children'),
     Output('cards', 'children'),
@@ -289,7 +303,7 @@ def update_graph(selected_fac):
    
     latest_week=dbc.Container(
         
-            html.H4('As of week ending 'f'{latest_wk}', className="display-left fs-1 font-weight-bold flex")
+            html.H4('As of Sunday, 'f'{latest_wk}', className="display-left fs-1 font-weight-bold flex")
         ),
     
     cards = dbc.CardGroup([   
@@ -305,12 +319,12 @@ def update_graph(selected_fac):
                         }
                     ), 
                 ],className="justify-content-end"
-            ), 
+            ),className="g-0 d-flex align-items-center", 
         ),
         dbc.Card(
             dbc.CardBody(
                 [
-                    html.P("Residents Vaccinated at Any Time", className="card-title text-center"),
+                    html.P("Facility Residents Vaccinated at Any Time", className="card-title text-center"),
                     html.H2(""),
                     html.H1(f'{ltnn_rev_pct_res_at_c19_vax:,.0f}%',
                         className="display-2 text-center font-weight-bold", 
@@ -319,12 +333,12 @@ def update_graph(selected_fac):
                         }
                     ),
                 ]
-            )
+            ),className="g-0 d-flex align-items-center",
         ),
         dbc.Card(
             dbc.CardBody(
                 [
-                    html.P("Healthcare Staff Vaccinations Up-to-Date", className="card-title text-center"),
+                    html.P("Healthcare Staff Vaccinations Up To Date", className="card-title text-center"),
                     html.H2(""),
                     html.H1(f'{ltnn_rev_pct_hcp_utd_c19_vax:,.0f}%',
                         className="display-2 text-center font-weight-bold",
@@ -333,25 +347,25 @@ def update_graph(selected_fac):
                         }
                     ),
                 ]
-            )
+            ),className="g-0 d-flex align-items-center",
         ),
         dbc.Card(
             dbc.CardBody(
                 [
-                    html.P("Residents Vaccinations Up-to-Date", className="card-title text-center"),
+                    html.P("Facility Residents Vaccinations Up To Date", className="card-title text-center"),
                     html.H2(""),
                     html.H1(f'{ltnn_rev_pct_res_utd_c19_vax:,.0f}%',
-                        className="display-2 text-center font-weight-bold",
+                        className="display-2 text-center font-weight-bold ",
                          style={
                             'color':'#b0841c'
                         }
                     ),
                 ]
-            ),
+            ),className="g-0 d-flex align-items-center",
         ),
-    ],
+    ],className="mb-3",
 ),
-    long=html.H4('From week ending 7-10-2022 through 'f'{latest_wk}', className="display-left fs-1 font-weight-bold flex")
+    long=html.H4('From Sunday, 7-10-2022 through Sunday, 'f'{latest_wk}', className="display-left fs-1 font-weight-bold flex")
 
     utd_hcp_res_ts_fig = go.Figure()
 
@@ -360,9 +374,11 @@ def update_graph(selected_fac):
             x=utd_ts_data['week_ending'],
             y=utd_ts_data['rev_pct_hcp_utd_c19_vax'],
             name="Healthcare Staff",
-            mode='lines',
+            mode='markers',
+            marker_size=10,
+            marker_symbol='diamond',
             text='<b>Week Ending Date:</b> ' +
-            utd_ts_data['week_ending']+'<br><b>Healthcare staff up-to-date</b> ' +
+            utd_ts_data['week_ending']+'<br><b>Healthcare staff Up To Date</b> ' +
             utd_ts_data['rev_pct_hcp_utd_c19_vax'].round().astype(
                 str)+'%',
             hoverinfo='text',
@@ -375,9 +391,11 @@ def update_graph(selected_fac):
             x=utd_ts_data['week_ending'],
             y=utd_ts_data['rev_pct_res_utd_c19_vax'],
             name="Residents",
-            mode='lines',
+            mode='markers',
+            marker_size=10,
+            marker_symbol='diamond',
             text='<b>Week Ending Date:</b> ' +
-            utd_ts_data['week_ending']+'<br><b>Residents up-to-date</b> ' +
+            utd_ts_data['week_ending']+'<br><b>Residents Up To Date</b> ' +
             utd_ts_data['rev_pct_res_utd_c19_vax'].round().astype(
                 str)+'%',
             hoverinfo='text',
@@ -392,7 +410,9 @@ def update_graph(selected_fac):
             x=utd_ts_data['week_ending'],
             y=utd_ts_data['rev_pct_hcp_anytime_c19_vax'],
             name="Healthcare Staff",
-            mode='lines',
+            mode='markers',
+            marker_size=10,
+            marker_symbol='diamond',
             text='<b>Week Ending Date:</b> ' +
             utd_ts_data['week_ending']+'<br><b>Healthcare staff Anytime</b> ' +
             utd_ts_data['rev_pct_hcp_anytime_c19_vax'].round().astype(
@@ -407,7 +427,9 @@ def update_graph(selected_fac):
             x=utd_ts_data['week_ending'],
             y=utd_ts_data['rev_pct_res_anytime_c19_vax'],
             name="Residents",
-            mode='lines',
+            mode='markers',
+            marker_size=10,
+            marker_symbol='diamond',
             text='<b>Week Ending Date:</b> ' +
             utd_ts_data['week_ending']+'<br><b>Residents Anytime</b> ' +
             utd_ts_data['rev_pct_res_anytime_c19_vax'].round().astype(
@@ -455,6 +477,7 @@ def update_graph(selected_fac):
         plot_bgcolor='#ffffff',
         yaxis_title='Percent',
         xaxis_title='Week Ending Date',
+        xaxis_dtick=2,
         font=dict(
             size=12
         ),
@@ -483,13 +506,14 @@ def update_graph(selected_fac):
             text='Received a Vaccination <b><em>at Any Time</em></b>',
             y=.9,
             yanchor='bottom'
-            
-        ),
+            ),
         #title_font_family="open sans semi bold",
         showlegend=True,
         plot_bgcolor='#ffffff',
         yaxis_title='Percent',
         xaxis_title='Week Ending Date',
+        
+        xaxis_dtick=2,
         font=dict(
             size=12
         ),
@@ -507,29 +531,48 @@ def update_graph(selected_fac):
         showgrid=True,
         gridwidth=1,
         gridcolor='LightGray',
-        range=(0, 100),
+        range=(-10, 110),
         autorange=False,
-        automargin=True
+         showline=True,
+        linewidth=1,
+        linecolor='LightGray'
+        #automargin=True
     )
+
 
     utd_hcp_res_ts_fig.update_xaxes(
         showgrid=False,
-        automargin=True
+        #automargin=True,
+        tickangle=45,
+        showline=True,
+        linewidth=1,
+        linecolor='LightGray',
+       
+        
     )
 
     at_hcp_res_ts_fig.update_yaxes(
         showgrid=True,
         # griddash='dash',
         gridwidth=1,
+        
         gridcolor='LightGray',
-        range=(0, 100),
+        range=(-10, 110),
         autorange=False,
-        automargin=True
+        showline=True,
+        linewidth=1,
+        linecolor='LightGray'
+        #automargin=True
     )
 
     at_hcp_res_ts_fig.update_xaxes(
         showgrid=False,
-        automargin=True
+        #automargin=True,
+        tickangle=45,
+        showline=True,
+        linewidth=1,
+        linecolor='LightGray',
+        
     )
 
 
