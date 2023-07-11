@@ -29,7 +29,8 @@ names_dict = {
     # 'rev_pct_hcp_utd_c19_vax': 'Healthcare Providers up-to-date with COVID-19 Vaccinations'
 }
 # convert week_ending col to datetime format
-nh_facil_level['week_ending'] = pd.to_datetime(nh_facil_level['week_ending'],format='%Y/%m/%d').dt.strftime('%m-%d-%Y')
+nh_facil_level['week_ending'] = pd.to_datetime(
+    nh_facil_level['week_ending'], format='%Y/%m/%d').dt.strftime('%m-%d-%Y')
 
 nh_facil_level.rename(columns=names_dict, inplace=True)
 nh_facil_level['provider_name'] = nh_facil_level['provider_name'].fillna('-')
@@ -44,7 +45,7 @@ ltnn_rev_pct_hcp_utd_c19_vax = (
     .groupby('provider_name')
     .apply(lambda x: x[x['rev_pct_hcp_utd_c19_vax'].notnull()].iloc[0] if x['rev_pct_hcp_utd_c19_vax'].notnull().any() else x.iloc[0])
     .reset_index(drop=True)
-    .loc[:,['provider_name','week_ending','rev_pct_hcp_utd_c19_vax']]
+    .loc[:, ['provider_name', 'week_ending', 'rev_pct_hcp_utd_c19_vax']]
 )
 
 # Set app theme
@@ -59,10 +60,15 @@ state_dropdown = dcc.Dropdown(id='state-dropdown',
                               placeholder='Type a state abbreviation or select from list',
                               clearable=False,
                               style={
-                            'border-style': 'ridge', 
-                            'border-radius': '15px',
-                            'border-color':'#00000020'
-                            }
+                                  #'border-style': 'ridge',
+                                  'border-radius': '30px',
+                                  'border-color': '#00000020',
+                                  'height': '5rem',
+                                  
+
+                                  'margin-left': '3.5rem',
+                                  'margin-right': '7rem'
+                              }
                               )
 
 city_dropdown = dcc.Dropdown(id='city-dropdown',
@@ -72,11 +78,15 @@ city_dropdown = dcc.Dropdown(id='city-dropdown',
                              placeholder='Type a city name or select from list',
                              clearable=False,
                              style={
-                            'border-style': 'ridge', 
-                            'border-radius': '15px',
-                            'border-color':'#00000020'
-                            }
-                            )
+                                 #'border-style': 'ridge',
+                                 'border-radius': '30px',
+                                 'border-color': '#00000020',
+                                 'height': '5rem',
+                                 'margin-left': '3.5rem',
+                                 'margin-right': '7rem',
+                                 
+                             }
+                             )
 
 fac_dropdown = dcc.Dropdown(id='fac-dropdown',
                             options=[{'label': i, 'value': i}
@@ -85,9 +95,12 @@ fac_dropdown = dcc.Dropdown(id='fac-dropdown',
                             placeholder='Type a facility name or select from list',
                             clearable=False,
                             style={
-                            'border-style': 'ridge', 
-                            'border-radius': '15px',
-                            'border-color':'#00000020'
+                                #'border-style': 'ridge',
+                                'border-radius': '30px',
+                                'border-color': '#00000020',
+                                'height': '5rem',
+                                'margin-left': '3.5rem',
+                                'margin-right': '7rem'
                             }
                             )
 fig = go.Figure()
@@ -101,124 +114,155 @@ def blank_figure():
 
     return fig
 
+
 def blank_cards():
     card = dbc.Card(dbc.CardBody(
-                [
+        [
                     html.H5("")
                     ]
-                    )
-                    )
+    )
+    )
     return card
 
+
 # Define the app layout
-app.layout =html.Div(children=[
-    html.H1(children='COVID-19 vaccination rates in Nursing Homes',
+app.layout = html.Div(children=[
+    html.H1(children='COVID-19 vaccination rates in U.S. nursing homes',
             style={
-                'textAlign': 'left',
-                'color': '#55595c',
+                'text-align': 'center',
+                'background-color': '#55595c',
+                'color': '#ffffff',
                 'title-font-family': 'sans-serif',
                 'font-family': 'sans-serif',
                 'font-size': '30px',
-                'margin': '3rem'}
+                'padding': '4rem',
+                'margin-bottom': '6rem'}
             ),
     html.Div(children=[
         html.Div(children=[
-            html.H6("Select a state",style={   
-            }),
+            html.H6("1. Select a state",
+                    style={'font-weight': 'bold',
+                           'font-style': 'italic',
+                           'margin-left': '4rem',
+                           'margin-right': '5rem'
+                           }
+                    ),
             state_dropdown],
-            ),
-            html.Br(),
+        ),
+        html.Br(),
         html.Div(children=[
-            html.H6("Select a city", style={ 
-            }),
+            html.H6("2. Select a city",
+                    style={
+                        'font-weight': 'bold',
+                        'font-style': 'italic',
+                        'margin-left': '4rem',
+                        'margin-right': '5rem'
+                    }),
             city_dropdown],
         ),
         html.Br(),
-         html.Div(children=[
-            html.H6("Select a nursing home",style={
-            }),
-        fac_dropdown],
-         )
+        html.Div(children=[
+            html.H6("3. Select a nursing home",
+                    style={
+                        'font-weight': 'bold',
+                        'font-style': 'italic',
+                         'margin-left': '4rem',
+                        'margin-right': '5rem'
+                    }),
+            fac_dropdown],
+        )
     ],
         style={'textAlign': 'left',
                'color': '#55595c',
                'title-font-family': 'sans-serif',
                'font-family': 'sans-serif',
-                'margin': '4rem'
+               'margin': '3rem',
                }
     ),
-    
+
     dcc.Loading(
         id="loading-1",
         type='circle',
         children=[
 
-        dbc.Row(children=[
-                  dbc.Row(id='latest_week', style={
-                        'margin-top': '4rem',
-                        'margin-left':'1rem',
-                        'margin-right':'1rem',
-                    }),
-                     
-                    dbc.Col(id='cards', style={
-                        'margin-left': '4rem',
-                        'margin-right': '4rem',
+            dbc.Row(children=[
+                dbc.Row(id='latest_week', style={
+                    'margin-top': '4rem',
+                    'margin-left': '2rem',
+                        'margin-right': '1rem',
+                        }),
+
+                dbc.Col(id='cards', style={
+                    'margin-left': '5rem',
+                        'margin-right': '5rem',
                         'margin-bottom': '4rem'
-                    }),
-        ]),
-                
+                        }),
+            ]),
+
             dbc.Row(id='long', style={
-                        'margin-top': '4rem',
-                        'margin-left':'3rem',
-                        'margin-right':'1rem'
-                    }),
+                'margin-top': '4rem',
+                'margin-left': '4rem',
+                'margin-right': '2rem'
+            }),
             dbc.Spinner(delay_hide=5, children=[
-            dcc.Graph(id='at_hcp_res_ts_fig',
-                      figure=blank_figure(),
-                      style={
-                        'margin-left': '4rem',
-                        'margin-right': '4rem',
-                        'height':'100%'
-                        }
-                        ),
-            dcc.Graph(id='utd_hcp_res_ts_fig',
-                      figure=blank_figure(),
-                      style={
-                        'margin-left': '4rem',
-                        'margin-right': '4rem'
-                        }
-                        ),
-                        ],
-                        
+                dcc.Graph(id='at_hcp_res_ts_fig',
+                          figure=blank_figure(),
+                          style={
+                              'margin-left': '5rem',
+                              'margin-right': '5rem',
+                              #'width': '90vh',
+                              'height': '90vh'
+                          }
+                          ),
+                dcc.Graph(id='utd_hcp_res_ts_fig',
+                          figure=blank_figure(),
+                          style={
+                              'margin-left': '5rem',
+                              'margin-right': '5rem',
+                              #'width': '90vh',
+                              'height': '90vh'
+                          }
+                          ),
+                dcc.Graph(id='at_hcp_nh_rank_bar',
+                          figure=blank_figure(),
+                          style={
+                              'margin-left': '6rem',
+                              'margin-right': '5rem',
+                              #'width': '90vh',
+                              'height': '90vh'
+                          }
+                          ),
+            ],
+
             ),
             html.Br(),
-                          
-           dbc.Row(children=([html.P("SOURCES: ",''),
-                    (html.A("CMS Covid-19 Nursing Home Data",
-                            href="https://data.cms.gov/covid-19/covid-19-nursing-home-data",
-                              target="_blank",style={
-                                  'color': '#1237E4'
-                                  })
-           )]),
-                          style={'textAlign': 'left',
-                          'color': '#1237E4',
-                          'title-font-family': 'sans-serif',
-                          'font-family': 'sans-serif',
-                          'margin': '3rem'
-                          },
-                          
-        ),
-        
-   
-],
- style={'textAlign': 'left',
-                          'color': '#55595c',
-                          'font-weight': 'bold',
-                          'title-font-family': 'sans-serif',
-                          'font-family': 'sans-serif',
-                          'margin': '4rem'
-                          }
-),
+
+            dbc.Row(children=([html.P("SOURCES: ", ''),
+                              (html.A("CMS Covid-19 Nursing Home Data",
+                                      href="https://data.cms.gov/covid-19/covid-19-nursing-home-data",
+                                      target="_blank", style={
+                                          'color': '#1237E4'
+                                      })
+                               )]),
+                    style={'textAlign': 'left',
+                           'color': '#1237E4',
+                           'title-font-family': 'sans-serif',
+                           'font-family': 'sans-serif',
+                           'margin': '4rem'
+                           },
+
+                    ),
+
+
+        ],
+        style={'textAlign': 'left',
+               'color': '#55595c',
+               'font-weight': 'bold',
+               'title-font-family': 'sans-serif',
+               'font-family': 'sans-serif',
+               'margin': '4rem'
+               }
+    ),
 ]
 )
 
@@ -227,7 +271,6 @@ app.layout =html.Div(children=[
 @app.callback(
     Output('city-dropdown', 'options'),
     [Input('state-dropdown', 'value')])
-
 def set_city_options(selected_state):
     if len(selected_state) > 0:
         selected_states = selected_state
@@ -258,114 +301,191 @@ def set_fac_options(selected_city):
 
 
 @app.callback(
+    Output('at_hcp_nh_rank_bar','figure'),
+    [Input('city-dropdown', 'value'),Input('fac-dropdown', 'value')])
+def update_graph(selected_city, selected_fac):
+    
+    
+    latest_wk = nh_facil_level.loc[(nh_facil_level['City'] == selected_city) & (
+    nh_facil_level['rev_pct_res_anytime_c19_vax'].notnull())].sort_values('week_ending', ascending=True).iloc[0]['week_ending']
+
+    utd_ts_data = nh_facil_level[(
+    nh_facil_level['City'] == selected_city) & (nh_facil_level['week_ending']==latest_wk)]
+
+    at_hcp_nh_rank_bar = go.Figure(go.Bar(
+        x=utd_ts_data['rev_pct_hcp_anytime_c19_vax'],
+        y=utd_ts_data['provider_name'].unique(),
+        orientation='h',
+        marker_color='#727ff2'
+        )
+        )
+
+    at_hcp_nh_rank_bar.update_layout(
+        yaxis={
+        'categoryorder':'total ascending'
+        },
+        bargap=0.1,  # Gap between bars
+        margin=dict(l=100), 
+        title=dict(
+            text='Healthcare Staff Vaccination Rates by Facility Ranked',
+            y=.9,
+            yanchor='bottom'
+        ),
+        #title_font_family="open sans semi bold",
+        showlegend=False,
+        plot_bgcolor='#ffffff',
+        yaxis_title='Nursing Home',
+        xaxis_title='Percent',
+        font=dict(
+            size=12
+        ),
+    
+        legend=dict(
+            #title_text='',
+            orientation="h",
+            yanchor="middle",
+            y=1.1,
+            xanchor="left",
+            x=.03  
+        ),
+        
+    )
+
+    at_hcp_nh_rank_bar.update_yaxes(
+        showgrid=False,
+        # griddash='dash',
+        gridwidth=1,
+        gridcolor='LightGray',
+        autorange=True,
+        showline=True,
+        linewidth=1,
+        linecolor='LightGray'
+        # automargin=True
+    )
+
+    at_hcp_nh_rank_bar.update_xaxes(
+        range=(0, 100),
+        showgrid=True,
+        automargin=False,
+        #tickangle=45,
+        showline=True,
+        linewidth=1,
+        linecolor='LightGray'
+
+    )
+    return at_hcp_nh_rank_bar
+
+
+@app.callback(
     Output('fac-dropdown', 'value'),
     [Input('fac-dropdown', 'options')])
 def set_fac_value(available_facs):
     return available_facs[0]['value']
 
-# callback to update the figure for the graph
-
-
+# callback to update the figure for the single facility data graphs
 @app.callback(
     [Output('latest_week', 'children'),
-    Output('long', 'children'),
-    Output('cards', 'children'),
-    Output('utd_hcp_res_ts_fig', 'figure'),
-    Output('at_hcp_res_ts_fig', 'figure')],
+     Output('long', 'children'),
+     Output('cards', 'children'),
+     Output('utd_hcp_res_ts_fig', 'figure'),
+     Output('at_hcp_res_ts_fig', 'figure')],
     [Input('fac-dropdown', 'value')]
 )
-
-
-
 def update_graph(selected_fac):
-    utd_ts_data = nh_facil_level[(nh_facil_level['provider_name'] == selected_fac)]
-         
-         ## & (nh_facil_level['week_ending'] > dt_obj)]
+    utd_ts_data = nh_facil_level[(
+        nh_facil_level['provider_name'] == selected_fac)]
     
-    ltnn_rev_pct_res_at_c19_vax = utd_ts_data.loc[(utd_ts_data['provider_name'] == selected_fac) & (utd_ts_data['rev_pct_res_anytime_c19_vax'].notnull())].sort_values('week_ending', ascending=False).iloc[0]['rev_pct_res_anytime_c19_vax'].round()
-    ltnn_rev_pct_res_utd_c19_vax = utd_ts_data.loc[(utd_ts_data['provider_name'] == selected_fac) & (utd_ts_data['rev_pct_res_utd_c19_vax'].notnull())].sort_values('week_ending', ascending=False).iloc[0]['rev_pct_res_utd_c19_vax'].round()
+    ltnn_rev_pct_res_at_c19_vax = utd_ts_data.loc[(utd_ts_data['provider_name'] == selected_fac) & (
+        utd_ts_data['rev_pct_res_anytime_c19_vax'].notnull())].sort_values('week_ending', ascending=False).iloc[0]['rev_pct_res_anytime_c19_vax'].round()
+    ltnn_rev_pct_res_utd_c19_vax = utd_ts_data.loc[(utd_ts_data['provider_name'] == selected_fac) & (
+        utd_ts_data['rev_pct_res_utd_c19_vax'].notnull())].sort_values('week_ending', ascending=False).iloc[0]['rev_pct_res_utd_c19_vax'].round()
 
-
-    ltnn_rev_pct_hcp_utd_c19_vax = utd_ts_data.loc[(utd_ts_data['provider_name'] == selected_fac) & (utd_ts_data['rev_pct_hcp_utd_c19_vax'].notnull())].sort_values('week_ending', ascending=False).iloc[0]['rev_pct_hcp_utd_c19_vax'].round()
-    min4_pct_hcp_utd_c19_vax = utd_ts_data.loc[(utd_ts_data['provider_name'] == selected_fac) & (utd_ts_data['rev_pct_hcp_utd_c19_vax'].notnull())].sort_values('week_ending', ascending=False).iloc[4]['rev_pct_hcp_utd_c19_vax'].round()
-    ltnn_rev_pct_hcp_at_c19_vax = utd_ts_data.loc[(utd_ts_data['provider_name'] == selected_fac) & (utd_ts_data['rev_pct_hcp_anytime_c19_vax'].notnull())].sort_values('week_ending', ascending=False).iloc[0]['rev_pct_hcp_anytime_c19_vax'].round()
-   
+    ltnn_rev_pct_hcp_utd_c19_vax = utd_ts_data.loc[(utd_ts_data['provider_name'] == selected_fac) & (
+        utd_ts_data['rev_pct_hcp_utd_c19_vax'].notnull())].sort_values('week_ending', ascending=False).iloc[0]['rev_pct_hcp_utd_c19_vax'].round()
+    min4_pct_hcp_utd_c19_vax = utd_ts_data.loc[(utd_ts_data['provider_name'] == selected_fac) & (
+        utd_ts_data['rev_pct_hcp_utd_c19_vax'].notnull())].sort_values('week_ending', ascending=False).iloc[4]['rev_pct_hcp_utd_c19_vax'].round()
+    ltnn_rev_pct_hcp_at_c19_vax = utd_ts_data.loc[(utd_ts_data['provider_name'] == selected_fac) & (
+        utd_ts_data['rev_pct_hcp_anytime_c19_vax'].notnull())].sort_values('week_ending', ascending=False).iloc[0]['rev_pct_hcp_anytime_c19_vax'].round()
 
     # (ltnn_rev_pct_hcp_utd_c19_vax-min4_pct_hcp_utd_c19_vax) /
 
     # utd_ts_data.sort_values('week_ending', ascending=False)
 
-    latest_wk = utd_ts_data.loc[(utd_ts_data['provider_name'] == selected_fac) & (utd_ts_data['rev_pct_res_anytime_c19_vax'].notnull())].sort_values('week_ending', ascending=False).iloc[0]['week_ending']
-    # latest_wk = latest_wk.dt.strftime('%m-%d-%Y')
-    # metric_value = utd_ts_data.loc[utd_ts_data['week_ending']==latest_week, 'rev_pct_res_utd_c19_vax']
-    # return metric_value, f'Latest Week: {latest_week}'
+    latest_wk = utd_ts_data.loc[(utd_ts_data['provider_name'] == selected_fac) & (
+        utd_ts_data['rev_pct_res_anytime_c19_vax'].notnull())].sort_values('week_ending', ascending=False).iloc[0]['week_ending']
+  
 
-   
-    latest_week=dbc.Container(
-        
-            html.H4('As of Sunday, 'f'{latest_wk}', className="display-left fs-1 font-weight-bold flex")
-        ),
-    
-    cards = dbc.CardGroup([   
+    latest_week = dbc.Container(
+
+        html.H4('As of Sunday, 'f'{latest_wk}',
+                className="display-left fs-1 font-weight-bold flex"),
+        className="mb-5"),
+
+    cards = dbc.CardGroup([
         dbc.Card(
             dbc.CardBody(
                 [
-                    html.P("Healthcare Staff Vaccinated at Any Time", className="card-title text-center"),
+                    html.P("Healthcare Staff Vaccinated at Any Time",
+                           className="card-title text-center"),
                     html.H2(""),
                     html.H1(f'{ltnn_rev_pct_hcp_at_c19_vax:,.0f}%',
-                        className="display-2 text-center font-weight-bold",
-                        style={
-                            'color':'#727ff2'
-                        }
-                    ), 
-                ],className="justify-content-end"
-            ),className="g-0 d-flex align-items-center", 
+                            className="display-2 text-center font-weight-bold",
+                            style={
+                                'color': '#727ff2'
+                            }
+                            ),
+                ], className="justify-content-end"
+            ), className="g-0 d-flex align-items-center",
         ),
         dbc.Card(
             dbc.CardBody(
                 [
-                    html.P("Facility Residents Vaccinated at Any Time", className="card-title text-center"),
+                    html.P("Facility Residents Vaccinated at Any Time",
+                           className="card-title text-center"),
                     html.H2(""),
                     html.H1(f'{ltnn_rev_pct_res_at_c19_vax:,.0f}%',
-                        className="display-2 text-center font-weight-bold", 
-                        style={
-                            'color':'#b0841c'
-                        }
-                    ),
+                            className="display-2 text-center font-weight-bold",
+                            style={
+                                'color': '#b0841c'
+                            }
+                            ),
                 ]
-            ),className="g-0 d-flex align-items-center",
+            ), className="g-0 d-flex align-items-center",
         ),
         dbc.Card(
             dbc.CardBody(
                 [
-                    html.P("Healthcare Staff Vaccinations Up To Date", className="card-title text-center"),
+                    html.P("Healthcare Staff Vaccinations Up To Date",
+                           className="card-title text-center"),
                     html.H2(""),
                     html.H1(f'{ltnn_rev_pct_hcp_utd_c19_vax:,.0f}%',
-                        className="display-2 text-center font-weight-bold",
-                        style={
-                            'color':'#727ff2'
-                        }
-                    ),
+                            className="display-2 text-center font-weight-bold",
+                            style={
+                                'color': '#727ff2'
+                            }
+                            ),
                 ]
-            ),className="g-0 d-flex align-items-center",
+            ), className="g-0 d-flex align-items-center",
         ),
         dbc.Card(
             dbc.CardBody(
                 [
-                    html.P("Facility Residents Vaccinations Up To Date", className="card-title text-center"),
+                    html.P("Facility Residents Vaccinations Up To Date",
+                           className="card-title text-center"),
                     html.H2(""),
                     html.H1(f'{ltnn_rev_pct_res_utd_c19_vax:,.0f}%',
-                        className="display-2 text-center font-weight-bold ",
-                         style={
-                            'color':'#b0841c'
-                        }
-                    ),
+                            className="display-2 text-center font-weight-bold ",
+                            style={
+                                'color': '#b0841c'
+                            }
+                            ),
                 ]
-            ),className="g-0 d-flex align-items-center",
+            ), className="g-0 d-flex align-items-center",
         ),
-    ],className="mb-3",
-),
-    long=html.H4('From Sunday, 7-10-2022 through Sunday, 'f'{latest_wk}', className="display-left fs-1 font-weight-bold flex")
+    ], className="mb-3",
+    ),
+    long = html.H4(
+        'From Sunday, 7-10-2022 through Sunday, 'f'{latest_wk}', className="display-left fs-1 font-weight-bold flex")
 
     utd_hcp_res_ts_fig = go.Figure()
 
@@ -374,14 +494,15 @@ def update_graph(selected_fac):
             x=utd_ts_data['week_ending'],
             y=utd_ts_data['rev_pct_hcp_utd_c19_vax'],
             name="Healthcare Staff",
-            mode='markers',
-            marker_size=10,
-            marker_symbol='diamond',
+            mode='lines+markers',
+            # marker_size=10,
+            # marker_symbol='diamond',
             text='<b>Week Ending Date:</b> ' +
             utd_ts_data['week_ending']+'<br><b>Healthcare staff Up To Date</b> ' +
             utd_ts_data['rev_pct_hcp_utd_c19_vax'].round().astype(
                 str)+'%',
             hoverinfo='text',
+            #fill='tozeroy',
             line=dict(color='#727ff2', width=3)
         ),
     )
@@ -391,14 +512,15 @@ def update_graph(selected_fac):
             x=utd_ts_data['week_ending'],
             y=utd_ts_data['rev_pct_res_utd_c19_vax'],
             name="Residents",
-            mode='markers',
-            marker_size=10,
-            marker_symbol='diamond',
+            mode='lines+markers',
+            # marker_size=10,
+            # marker_symbol='diamond',
             text='<b>Week Ending Date:</b> ' +
             utd_ts_data['week_ending']+'<br><b>Residents Up To Date</b> ' +
             utd_ts_data['rev_pct_res_utd_c19_vax'].round().astype(
                 str)+'%',
             hoverinfo='text',
+            #fill='tonexty',
             line=dict(color='#b0841c', width=3)
         ),
     )
@@ -410,14 +532,15 @@ def update_graph(selected_fac):
             x=utd_ts_data['week_ending'],
             y=utd_ts_data['rev_pct_hcp_anytime_c19_vax'],
             name="Healthcare Staff",
-            mode='markers',
-            marker_size=10,
-            marker_symbol='diamond',
+            mode='lines+markers',
+            # marker_size=10,
+            # marker_symbol='diamond',
             text='<b>Week Ending Date:</b> ' +
             utd_ts_data['week_ending']+'<br><b>Healthcare staff Anytime</b> ' +
             utd_ts_data['rev_pct_hcp_anytime_c19_vax'].round().astype(
                 str)+'%',
             hoverinfo='text',
+            #fill='tozeroy',
             line=dict(color='#727ff2', width=3)
         ),
     )
@@ -427,18 +550,21 @@ def update_graph(selected_fac):
             x=utd_ts_data['week_ending'],
             y=utd_ts_data['rev_pct_res_anytime_c19_vax'],
             name="Residents",
-            mode='markers',
-            marker_size=10,
-            marker_symbol='diamond',
+            mode='lines+markers',
+            # marker_size=10,
+            # marker_symbol='diamond',
             text='<b>Week Ending Date:</b> ' +
             utd_ts_data['week_ending']+'<br><b>Residents Anytime</b> ' +
             utd_ts_data['rev_pct_res_anytime_c19_vax'].round().astype(
                 str)+'%',
             hoverinfo='text',
+            #fill='tonexty',
             line=dict(color='#b0841c', width=3,
                       )
         ),
     )
+
+
 
     # fig.add_annotation(text='<b>Residents</b>',
     #                    x=filtered_nh_data['week_ending'].iat[-1], y=filtered_nh_data['rev_pct_res_utd_c19_vax'].iat[-1],
@@ -471,48 +597,10 @@ def update_graph(selected_fac):
             y=.9,
             yanchor='bottom'
         ),
-
-        # title_font_family="Arial",
         showlegend=True,
         plot_bgcolor='#ffffff',
         yaxis_title='Percent',
         xaxis_title='Week Ending Date',
-        xaxis_dtick=2,
-        font=dict(
-            size=12
-        ),
-            legend=dict(
-            title_text='',
-            orientation="h",
-            yanchor="middle",
-            y=1.1,
-            xanchor="left",
-            x=.03
-        )
-    )
-
-    at_hcp_res_ts_fig.update_layout(
-        
-        # margin=dict(
-        #     l=20,
-        #     r=20,
-        #     t=100,
-        #     # b=20,
-        #     # pad=4
-        # ),
-        
-        #template = load_figure_template('LUX'),
-        title=dict(
-            text='Received a Vaccination <b><em>at Any Time</em></b>',
-            y=.9,
-            yanchor='bottom'
-            ),
-        #title_font_family="open sans semi bold",
-        showlegend=True,
-        plot_bgcolor='#ffffff',
-        yaxis_title='Percent',
-        xaxis_title='Week Ending Date',
-        
         xaxis_dtick=2,
         font=dict(
             size=12
@@ -521,9 +609,35 @@ def update_graph(selected_fac):
             title_text='',
             orientation="h",
             yanchor="middle",
-            y=1.1,
+            y=1,
             xanchor="left",
-            x=.03
+            x=.05
+        )
+    )
+
+    at_hcp_res_ts_fig.update_layout(
+
+        title=dict(
+            text='Received a Vaccination <b><em>at Any Time</em></b>',
+            y=.9,
+            yanchor='bottom'
+        ),
+        #title_font_family="open sans semi bold",
+        showlegend=True,
+        plot_bgcolor='#ffffff',
+        yaxis_title='Percent',
+        xaxis_title='Week Ending Date',
+        xaxis_dtick=2,
+        font=dict(
+            size=12
+        ),
+        legend=dict(
+            title_text='',
+            orientation="h",
+            yanchor="middle",
+            y=1,
+            xanchor="left",
+            x=.05
         )
     )
 
@@ -533,55 +647,48 @@ def update_graph(selected_fac):
         gridcolor='LightGray',
         range=(-10, 110),
         autorange=False,
-         showline=True,
+        showline=True,
         linewidth=1,
         linecolor='LightGray'
-        #automargin=True
+        # automargin=True
     )
-
 
     utd_hcp_res_ts_fig.update_xaxes(
         showgrid=False,
-        #automargin=True,
+        # automargin=True,
         tickangle=45,
         showline=True,
         linewidth=1,
-        linecolor='LightGray',
-       
-        
+        linecolor='LightGray'
     )
 
     at_hcp_res_ts_fig.update_yaxes(
         showgrid=True,
         # griddash='dash',
         gridwidth=1,
-        
         gridcolor='LightGray',
         range=(-10, 110),
         autorange=False,
         showline=True,
         linewidth=1,
         linecolor='LightGray'
-        #automargin=True
+        # automargin=True
     )
 
     at_hcp_res_ts_fig.update_xaxes(
         showgrid=False,
-        #automargin=True,
+        # automargin=True,
         tickangle=45,
         showline=True,
         linewidth=1,
-        linecolor='LightGray',
-        
+        linecolor='LightGray'
     )
 
-
-    #return ind_utd_res_c19_vax, ind_utd_hcp_c19_vax, ind_at_hcp_c19_vax, 
+    # return ind_utd_res_c19_vax, ind_utd_hcp_c19_vax, ind_at_hcp_c19_vax,
     return latest_week, long, cards, utd_hcp_res_ts_fig, at_hcp_res_ts_fig
+
 
 # Run the app
 if __name__ == '__main__':
     app.run_server(debug=True)
     server = app.server
-
-
