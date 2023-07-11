@@ -1,11 +1,12 @@
 hr {
-    border-top: 2px solid gray;
+    border-top: 2px solid gray; 
 }
 
 .dropdown-container {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
-    gap: 10px;
+    /*gap: 10px; */
+    padding: 5rem
 }
 
 .dropdown-button {
